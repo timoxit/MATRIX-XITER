@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../utils/api';
 import { 
   LogOut, Search, Settings, Users, Server, Calendar, UserCheck, 
-  RefreshCw, ExternalLink, Link, Check, ShieldAlert, Copy
+  RefreshCw, ExternalLink, Link, Check, ShieldAlert, Copy, Smartphone, Monitor
 } from 'lucide-react';
 
 export default function Selector({ user, onSelectGuild, onLogout }) {
@@ -30,6 +30,7 @@ export default function Selector({ user, onSelectGuild, onLogout }) {
 
   // Form states
   const [formStatus, setFormStatus] = useState('online');
+  const [formMobileStatus, setFormMobileStatus] = useState(false);
   const [formActivityType, setFormActivityType] = useState(4);
   const [formActivityText, setFormActivityText] = useState('I control the server');
 
@@ -106,6 +107,7 @@ export default function Selector({ user, onSelectGuild, onLogout }) {
       
       // Initialize form fields
       setFormStatus(data.settings.status || 'online');
+      setFormMobileStatus(!!data.settings.mobileStatus);
       setFormActivityType(data.settings.activityType ?? 4);
       setFormActivityText(data.settings.activityText || '');
     } catch (err) {
@@ -123,6 +125,7 @@ export default function Selector({ user, onSelectGuild, onLogout }) {
     try {
       const res = await api.saveBotSettings({
         status: formStatus,
+        mobileStatus: formMobileStatus,
         activityType: formActivityType,
         activityText: formActivityText
       });
@@ -765,19 +768,73 @@ export default function Selector({ user, onSelectGuild, onLogout }) {
                     <form onSubmit={handleSaveBotSettings} className="glass-panel" style={{ padding: '30px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '24px', borderRadius: '16px', position: 'relative' }}>
                       <h3 style={{ fontSize: '1.35rem', fontWeight: '800', color: '#fff', fontFamily: 'Outfit', display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <Settings size={20} style={{ color: 'var(--primary)' }} />
-                        Bot Status Manager
+                        Bot Identity & Status Controls
                       </h3>
+
+                      {/* Device Identity Mode Selector */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Device Identity Mode</label>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                          <button
+                            type="button"
+                            onClick={() => setFormMobileStatus(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                              padding: '12px 16px',
+                              background: !formMobileStatus ? 'rgba(99, 102, 241, 0.12)' : 'rgba(30, 41, 59, 0.25)',
+                              border: '1px solid',
+                              borderColor: !formMobileStatus ? 'var(--primary)' : 'rgba(255,255,255,0.04)',
+                              borderRadius: '10px',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              textAlign: 'left'
+                            }}
+                          >
+                            <Monitor size={20} style={{ color: !formMobileStatus ? 'var(--primary)' : 'var(--text-muted)' }} />
+                            <div>
+                              <div style={{ fontSize: '0.88rem', fontWeight: '700', color: !formMobileStatus ? '#fff' : 'var(--text-secondary)' }}>Desktop Client</div>
+                              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Standard bot presence</div>
+                            </div>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setFormMobileStatus(true)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                              padding: '12px 16px',
+                              background: formMobileStatus ? 'rgba(16, 185, 129, 0.12)' : 'rgba(30, 41, 59, 0.25)',
+                              border: '1px solid',
+                              borderColor: formMobileStatus ? '#10b981' : 'rgba(255,255,255,0.04)',
+                              borderRadius: '10px',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              textAlign: 'left'
+                            }}
+                          >
+                            <Smartphone size={20} style={{ color: formMobileStatus ? '#10b981' : 'var(--text-muted)' }} />
+                            <div>
+                              <div style={{ fontSize: '0.88rem', fontWeight: '700', color: formMobileStatus ? '#fff' : 'var(--text-secondary)' }}>Mobile Account</div>
+                              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Displays mobile phone badge</div>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
                       
                       {/* Discord Status Selector */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Discord Status</label>
+                        <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Presence Status</label>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
                           
                           {[
-                            { value: 'online', label: 'Online', color: '#10b981', desc: 'Active and responsive' },
-                            { value: 'idle', label: 'Idle', color: '#f59e0b', desc: 'Away / Inactive' },
-                            { value: 'dnd', label: 'Do Not Disturb', color: '#ef4444', desc: 'Quiet Mode' },
-                            { value: 'invisible', label: 'Invisible', color: '#64748b', desc: 'Appear offline' }
+                            { value: 'online', label: 'Online', color: '#10b981', desc: 'Active (Green Dot)' },
+                            { value: 'idle', label: 'Idle', color: '#f59e0b', desc: 'Away (Yellow Moon)' },
+                            { value: 'dnd', label: 'Do Not Disturb', color: '#ef4444', desc: 'Busy (Red Dot)' },
+                            { value: 'invisible', label: 'Invisible / Offline', color: '#64748b', desc: 'Removes Green Status' }
                           ].map(statusOpt => (
                             <button
                               key={statusOpt.value}
@@ -831,7 +888,7 @@ export default function Selector({ user, onSelectGuild, onLogout }) {
                         </label>
                         <input
                           type="text"
-                          placeholder={formActivityType === 4 ? "e.g. Analyzing workspace..." : "e.g. Minecraft, Spotify, etc."}
+                          placeholder={formActivityType === 4 ? "e.g. Active on mobile..." : "e.g. Minecraft, Spotify, etc."}
                           value={formActivityText}
                           onChange={(e) => setFormActivityText(e.target.value)}
                           maxLength={128}
@@ -873,7 +930,7 @@ export default function Selector({ user, onSelectGuild, onLogout }) {
                           ) : (
                             <>
                               <Settings size={16} />
-                              Apply Status
+                              Apply Status & Device Mode
                             </>
                           )}
                         </button>
@@ -899,7 +956,7 @@ export default function Selector({ user, onSelectGuild, onLogout }) {
                           <div style={{ height: '60px', backgroundColor: '#5865F2' }} />
                           
                           <div style={{ padding: '16px', position: 'relative', marginTop: '-36px' }}>
-                            {/* Avatar with Status Dot */}
+                            {/* Avatar with Status Dot / Mobile Badge */}
                             <div style={{ position: 'relative', display: 'inline-block', width: '80px', height: '80px' }}>
                               <img
                                 src={botUser?.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}
@@ -916,13 +973,20 @@ export default function Selector({ user, onSelectGuild, onLogout }) {
                                 position: 'absolute',
                                 bottom: '2px',
                                 right: '2px',
-                                width: '16px',
-                                height: '16px',
-                                borderRadius: '50%',
+                                width: formMobileStatus ? '18px' : '16px',
+                                height: formMobileStatus ? '22px' : '16px',
+                                borderRadius: formMobileStatus ? '4px' : '50%',
                                 backgroundColor: formStatus === 'online' ? '#3ba55d' : formStatus === 'idle' ? '#faa81a' : formStatus === 'dnd' ? '#ed4245' : '#747f8d',
                                 border: '3px solid #18191c',
-                                boxShadow: '0 0 10px rgba(0,0,0,0.5)'
-                              }} />
+                                boxShadow: '0 0 10px rgba(0,0,0,0.5)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}>
+                                {formMobileStatus && (
+                                  <Smartphone size={10} style={{ color: '#fff' }} />
+                                )}
+                              </div>
                             </div>
 
                             {/* User details */}
@@ -939,7 +1003,14 @@ export default function Selector({ user, onSelectGuild, onLogout }) {
                                   textTransform: 'uppercase'
                                 }}>Bot</span>
                               </div>
-                              <div style={{ fontSize: '0.78rem', color: '#b9bbbe', marginTop: '2px' }}>{botUser?.tag || 'MATRIX XITER#0000'}</div>
+                              <div style={{ fontSize: '0.78rem', color: '#b9bbbe', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                {botUser?.tag || 'MATRIX XITER#0000'}
+                                {formMobileStatus && (
+                                  <span style={{ fontSize: '0.65rem', color: '#10b981', background: 'rgba(16,185,129,0.15)', padding: '1px 6px', borderRadius: '4px' }}>
+                                    📱 Mobile Device
+                                  </span>
+                                )}
+                              </div>
                             </div>
 
                             <hr style={{ borderColor: 'rgba(255,255,255,0.06)', margin: '14px 0' }} />
@@ -959,7 +1030,7 @@ export default function Selector({ user, onSelectGuild, onLogout }) {
                                 {formActivityType === 4 ? (
                                   <>
                                     <span style={{ fontSize: '1.1rem' }}>💬</span>
-                                    <span>{formActivityText || 'I control the server'}</span>
+                                    <span>{formActivityText || 'Active'}</span>
                                   </>
                                 ) : (
                                   <span style={{ fontWeight: '600' }}>{formActivityText || 'Nothing'}</span>
