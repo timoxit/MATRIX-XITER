@@ -825,6 +825,25 @@ export default function Selector({ user, onSelectGuild, onLogout }) {
                         </div>
                       </div>
                       
+                      {/* Discord Platform Guidance Tip */}
+                      <div style={{
+                        background: 'rgba(99, 102, 241, 0.08)',
+                        border: '1px solid rgba(99, 102, 241, 0.25)',
+                        borderRadius: '10px',
+                        padding: '12px 16px',
+                        fontSize: '0.82rem',
+                        color: 'var(--text-secondary)',
+                        lineHeight: '1.5'
+                      }}>
+                        <div style={{ color: '#a5b4fc', fontWeight: '700', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          💡 How to Remove Green Online Status
+                        </div>
+                        <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
+                          <li><strong style={{ color: '#fff' }}>Remove Green Dot Completely:</strong> Select <span style={{ color: '#94a3b8', fontWeight: '700' }}>Invisible / Offline</span>. The bot will appear offline with <u>no green status dot</u>, but will remain 100% online & active.</li>
+                          <li><strong style={{ color: '#fff' }}>Mobile Status Text:</strong> Select <span style={{ color: '#a5b4fc', fontWeight: '700' }}>Custom Status</span> and type <code style={{ color: '#10b981', background: 'rgba(0,0,0,0.3)', padding: '2px 6px', borderRadius: '4px' }}>📱 Online on Mobile</code> to display mobile status text on your bot profile.</li>
+                        </ul>
+                      </div>
+
                       {/* Discord Status Selector */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         <label style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Presence Status</label>
